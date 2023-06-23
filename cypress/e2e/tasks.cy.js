@@ -35,16 +35,28 @@ describe("tasks", () => {
     });
   });
 
-  // context("atualização", () => {
-  //   it("deve concluir uma tarefa", () => {
-  //     const taskName = "Ler um livro de Node.js";
+  context("atualização", () => {
+    it("deve concluir uma tarefa", () => {
+      const task = {
+        name: "Ler um livro de Node.js",
+        is_done: false,
+      };
 
-  //     cy.visit("http://127.0.0.1:8080/");
+      cy.removeTaskByName(task.name);
+      cy.postTask(task);
 
-  //     cy.contains("p", taskName)
-  //       .parent()
-  //       .find("._listItemToggle_1kgm5_16")
-  //       .click();
-  //   });
-  // });
+      cy.visit("http://127.0.0.1:8080/");
+
+      cy.contains("p", task.name)
+        .parent()
+        .find("button[class*=ItemToggle]")
+        .click();
+
+      cy.contains("p", task.name).should(
+        "have.css",
+        "text-decoration-line",
+        "line-through"
+      );
+    });
+  });
 });
