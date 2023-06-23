@@ -59,4 +59,25 @@ describe("tasks", () => {
       );
     });
   });
+
+  context("exclusão", () => {
+    it("deve remover uma tarefa", () => {
+      const task = {
+        name: "Ler um livro de JS",
+        is_done: false,
+      };
+
+      cy.removeTaskByName(task.name);
+      cy.postTask(task);
+
+      cy.visit("http://127.0.0.1:8080/");
+
+      cy.contains("p", task.name)
+        .parent()
+        .find("button[class*=ItemDelete]")
+        .click();
+
+      cy.contains("p", task.name).should("not.exist");
+    });
+  });
 });
