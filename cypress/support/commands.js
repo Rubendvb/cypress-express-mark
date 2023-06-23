@@ -40,7 +40,7 @@ Cypress.Commands.add("isRequired", (targetMessage) => {
   cy.get("@inputTask")
     .invoke("prop", "validationMessage")
     .should((text) => {
-      expect("This is a required field").to.eq(text);
+      expect(targetMessage).to.eq(text);
     });
 });
 
