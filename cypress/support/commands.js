@@ -23,3 +23,43 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("createTask", (taskName = "") => {
+  cy.visit("http://127.0.0.1:8080/");
+
+  cy.get("#newTask").as("inputTask");
+
+  if (taskName !== "") {
+    cy.get("@inputTask").type(taskName);
+  }
+
+  cy.contains("button", "Create").click();
+});
+
+Cypress.Commands.add("isRequired", (targetMessage) => {
+  cy.get("@inputTask")
+    .invoke("prop", "validationMessage")
+    .should((text) => {
+      expect("This is a required field").to.eq(text);
+    });
+});
+
+Cypress.Commands.add("removeTaskByName", (taskName) => {
+  cy.request({
+    url: "http://localhost:3333/helper/tasks",
+    method: "DELETE",
+    body: { name: taskName },
+  }).then((res) => {
+    expect(res.status).to.eq(204);
+  });
+});
+
+Cypress.Commands.add("postTask", (task) => {
+  cy.request({
+    url: "http://localhost:3333/tasks",
+    method: "POST",
+    body: task,
+  }).then((res) => {
+    expect(res.status).to.eq(201);
+  });
+});
