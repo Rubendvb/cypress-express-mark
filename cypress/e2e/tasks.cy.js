@@ -1,83 +1,88 @@
 /// <reference types="cypress" />
 
-describe("tasks", () => {
-  context("cadastro", () => {
-    it("deve cadastrar uma nova tarefa", () => {
-      const taskName = "Ler um livro de JS";
+describe('tasks', () => {
+  let testData
 
-      cy.removeTaskByName(taskName);
+  before(() => {
+    cy.fixture('tasks').then((task) => {
+      testData = task
+    })
+  })
 
-      cy.createTask(taskName);
+  context('cadastro', () => {
+    it('deve cadastrar uma nova tarefa', () => {
+      const taskName = 'Ler um livro de JS'
 
-      cy.contains("main div p", taskName).should("be.visible");
-    });
+      cy.removeTaskByName(taskName)
 
-    it("não deve permitir tarefa duplicada", () => {
+      cy.createTask(taskName)
+
+      cy.contains('main div p', taskName).should('be.visible')
+    })
+
+    it('não deve permitir tarefa duplicada', () => {
+      const task = testData.dup
+
+      cy.removeTaskByName(task.name)
+
+      cy.postTask(task)
+      cy.createTask(task.name)
+
+      cy.get('.swal2-html-container')
+        .should('be.visible')
+        .should('have.text', 'Task already exists!')
+    })
+
+    it('campo obrigatório', () => {
+      cy.createTask()
+
+      cy.isRequired('This is a required field')
+    })
+  })
+
+  context('atualização', () => {
+    it('deve concluir uma tarefa', () => {
       const task = {
-        name: "Ler um livro de Node.js",
+        name: 'Ler um livro de Node.js',
         is_done: false,
-      };
+      }
 
-      cy.removeTaskByName(task.name);
+      cy.removeTaskByName(task.name)
+      cy.postTask(task)
 
-      cy.postTask(task);
-      cy.createTask(task.name);
+      cy.visit('/')
 
-      cy.get(".swal2-html-container")
-        .should("be.visible")
-        .should("have.text", "Task already exists!");
-    });
-
-    it("campo obrigatório", () => {
-      cy.createTask();
-
-      cy.isRequired("This is a required field");
-    });
-  });
-
-  context("atualização", () => {
-    it("deve concluir uma tarefa", () => {
-      const task = {
-        name: "Ler um livro de Node.js",
-        is_done: false,
-      };
-
-      cy.removeTaskByName(task.name);
-      cy.postTask(task);
-
-      cy.visit("/");
-
-      cy.contains("p", task.name)
+      cy.contains('p', task.name)
         .parent()
-        .find("button[class*=ItemToggle]")
-        .click();
+        .find('button[class*=ItemToggle]')
+        .click()
 
-      cy.contains("p", task.name).should(
-        "have.css",
-        "text-decoration-line",
-        "line-through"
-      );
-    });
-  });
+      cy.contains('p', task.name).should(
+        'have.css',
+        'text-decoration-line',
+        'line-through'
+      )
+    })
+  })
 
-  context("exclusão", () => {
-    it("deve remover uma tarefa", () => {
+  context('exclusão', () => {
+    it('deve remover uma tarefa', () => {
       const task = {
-        name: "Ler um livro de JS",
+        name: 'Ler um livro de JS',
         is_done: false,
-      };
+      }
 
-      cy.removeTaskByName(task.name);
-      cy.postTask(task);
+      cy.removeTaskByName(task.name)
+      cy.postTask(task)
 
-      cy.visit("/");
+      cy.visit('/')
 
-      cy.contains("p", task.name)
+      cy.contains('p', task.name)
         .parent()
-        .find("button[class*=ItemDelete]")
-        .click();
+        .find('button[class*=ItemDelete]')
+        .click()
 
-      cy.contains("p", task.name).should("not.exist");
-    });
-  });
-});
+      cy.contains('p', task.name).should('not.exist')
+    })
+  })
+})
